@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IconSprout — Favicon Bundle Generator</title>
+  <meta name="description" content="Generate a complete favicon bundle from a single uploaded logo or entered emoji text in seconds.">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Preload critical dependencies -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
+          integrity="sha512-XmdbF8eFlGRaTqKNDjb8YcVgbuJNjqRVLPj2Qja8MnOxeHnIFRfVeLOWpBMiVLKyD14qXR5hoW3zFCshS/EtA=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+  <div id="app">
+    <!-- ===================== HEADER ===================== -->
+    <header class="site-header">
+      <div class="header-inner">
+        <a href="#" class="logo" aria-label="IconSprout home">
+          <span class="logo-icon" aria-hidden="true">🌱</span>
+          <span class="logo-text">IconSprout</span>
+        </a>
+        <p class="tagline">Generate a complete favicon bundle in seconds</p>
+      </div>
+    </header>
+
+    <main class="main-content">
+
+      <!-- ===================== INPUT SECTION ===================== -->
+      <section class="input-section" aria-labelledby="input-heading">
+        <h2 id="input-heading" class="sr-only">Upload or type your icon source</h2>
+
+        <!-- Mode toggle -->
+        <div class="mode-toggle" role="tablist" aria-label="Input method">
+          <button id="tab-upload"
+                  class="mode-tab active"
+                  role="tab"
+                  aria-selected="true"
+                  aria-controls="panel-upload"
+                  id="tab-upload-label">
+            📁 Upload Image
+          </button>
+          <button id="tab-emoji"
+                  class="mode-tab"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="panel-emoji"
+                  id="tab-emoji-label">
+            ✏️ Emoji Text
+          </button>
+        </div>
+
+        <!-- Upload panel -->
+        <div id="panel-upload"
+             class="input-panel active"
+             role="tabpanel"
+             aria-labelledby="tab-upload-label">
+          <div id="drop-zone"
+               class="drop-zone"
+               tabindex="0"
+               role="region"
+               aria-label="Image upload area. Drop a PNG, JPG, or SVG here, or click to browse.">
+            <div class="drop-zone-content">
+              <span class="drop-icon" aria-hidden="true">⬆️</span>
+              <p class="drop-title">Drop your image here</p>
+              <p class="drop-subtitle">PNG, JPG, or SVG &middot; Transparent backgrounds recommended</p>
+              <label class="browse-btn" for="file-input">Browse Files</label>
+              <input type="file"
+                     id="file-input"
+                     accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                     hidden>
+            </div>
+          </div>
+          <p id="upload-error" class="error-message" role="alert" hidden></p>
+          <p id="upload-success" class="success-message" role="status" hidden></p>
+        </div>
+
+        <!-- Emoji panel -->
+        <div id="panel-emoji"
+             class="input-panel"
+             role="tabpanel"
+             aria-labelledby="tab-emoji-label"
+             hidden>
+          <div class="emoji-input-group">
+            <label for="emoji-text">Enter emoji text</label>
+            <input type="text"
+                   id="emoji-text"
+                   class="emoji-input"
+                   maxlength="4"
+                   placeholder="e.g. 🚀 🐱 🎨"
+                   autocomplete="off"
+                   spellcheck="false">
+            <p class="emoji-hint">Type one or two emojis — we'll render them as your icon source.</p>
+          </div>
+          <p id="emoji-error" class="error-message" role="alert" hidden></p>
+        </div>
+      </section>
+
+      <!-- ===================== PREVIEW SECTION ===================== -->
+      <section class="preview-section"
+               id="preview-section"
+               aria-labelledby="preview-heading"
+               hidden>
+        <h2 id="preview-heading" class="section-heading">Preview</h2>
+
+        <!-- Source info bar -->
+        <div class="source-info" id="source-info">
+          <span class="source-label">Source:</span>
+          <span class="source-value" id="source-value"></span>
+        </div>
+
+        <!-- Icon preview cards grid -->
+        <div class="preview-grid" id="preview-grid" role="list" aria-label="Generated favicon variants">
+          <!-- Cards are injected by app.js at runtime -->
+        </div>
+
+        <!-- Dominant color swatch (shown when a background color was auto-detected) -->
+        <div class="color-info" id="color-info" hidden>
+          <span class="color-swatch" id="color-swatch" aria-hidden="true"></span>
+          <span class="color-label">Detected background color: <strong id="color-value"></strong></span>
+        </div>
+      </section>
+
+      <!-- ===================== ACTIONS SECTION ===================== -->
+      <section class="actions-section"
+               id="actions-section"
+               aria-labelledby="actions-heading"
+               hidden>
+        <h2 id="actions-heading" class="sr-only">Download actions</h2>
+        <div class="action-buttons">
+          <button id="btn-download-zip"
+                  class="btn btn-primary btn-download"
+                  disabled
+                  aria-describedby="zip-status">
+            📦 Download All (ZIP)
+          </button>
+          <button id="btn-download-single"
+                  class="btn btn-secondary"
+                  disabled>
+            ⬇️ Download Current Variant
+          </button>
+          <button id="btn-copy-snippet"
+                  class="btn btn-secondary">
+            📋 Copy HTML Snippet
+          </button>
+          <button id="btn-reset"
+                  class="btn btn-ghost">
+            🔄 Start Over
+          </button>
+        </div>
+        <p id="zip-status" class="status-message" role="status" aria-live="polite"></p>
+      </section>
+
+      <!-- ===================== SNIPPET SECTION ===================== -->
+      <section class="snippet-section"
+               id="snippet-section"
+               aria-labelledby="snippet-heading"
+               hidden>
+        <h2 id="snippet-heading" class="section-heading">HTML Head Snippet</h2>
+        <p class="snippet-intro">Paste the following block inside your <code>&lt;head&gt;</code> tag:</p>
+        <div class="snippet-wrapper">
+          <pre class="snippet-code" id="snippet-code"><code></code></pre>
+          <button id="btn-copy-snippet-inline"
+                  class="copy-btn"
+                  title="Copy snippet to clipboard">
+            📋 Copy
+          </button>
+        </div>
+        <p id="snippet-copy-feedback"
+           class="copy-feedback"
+           role="status"
+           aria-live="polite"
+           hidden>✅ Copied to clipboard!</p>
+      </section>
+
+    </main>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer class="site-footer">
+      <p>Built with ❤️ by <a href="https://github.com/wiradifit/iconsprout" target="_blank" rel="noopener noreferrer">IconSprout</a> &middot; All processing happens locally in your browser — no uploads to any server.</p>
+    </footer>
+  </div>
+
+  <!-- ===================== APPLICATION SCRIPTS ===================== -->
+  <!-- Order matters: utility modules first, then main controller last -->
+  <script src="color-detection.js"></script>
+  <script src="favicon-generator.js"></script>
+  <script src="snippet-generator.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

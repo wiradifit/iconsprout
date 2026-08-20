@@ -1,0 +1,22 @@
+# .gitignore for IconSprout
+
+# Node / JS (if used)
+node_modules/
+dist/
+.cache/
+
+# Editor
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Env
+.env
+.env.local
+
+
+# OS
+Thumbs.db
+.DS_Store

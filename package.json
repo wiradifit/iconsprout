@@ -1,0 +1,34 @@
+{
+  "name": "iconsprout",
+  "version": "1.0.0",
+  "description": "Generate a complete favicon bundle — PNGs, ICO, Apple touch icons, and Android masks — from a single uploaded logo or entered emoji text in seconds.",
+  "main": "app.js",
+  "scripts": {
+    "start": "npx serve ."
+  },
+  "keywords": [
+    "favicon",
+    "icon",
+    "apple-touch-icon",
+    "android-icon",
+    "ICO",
+    "manifest",
+    "generator"
+  ],
+  "author": "wiradifit",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wiradifit/iconsprout"
+  },
+  "bugs": {
+    "url": "https://github.com/wiradifit/iconsprout/issues"
+  },
+  "homepage": "https://github.com/wiradifit/iconsprout",
+  "dependencies": {
+    "jszip": "^3.10.1"
+  },
+  "devDependencies": {
+    "serve": "^14.2.1"
+  }
+}
